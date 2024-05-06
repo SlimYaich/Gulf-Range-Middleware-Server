@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Created</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #0275d8;
+            text-align: center;
+        }
+        p {
+            text-align: center;
+            font-size: 16px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #0275d8;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        a:hover {
+            background-color: #025aa5;
+        }
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background-color: #d9534f;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 14px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+    <a href="http://127.0.0.1:5000/" class="back-button">Back To Home</a>
+    <h1>API Created Successfully!</h1>
+    <p>Your combined API is ready. You can access it at the following URL:</p>
+    <p><a href="{{ api_url }}">{{ api_url }}</a></p>
+</body>
+</html>

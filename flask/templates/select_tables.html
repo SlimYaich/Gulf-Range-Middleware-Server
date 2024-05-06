@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Tables</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        #container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        #left-panel, #right-panel {
+            flex: 1;
+            margin: 10px;
+        }
+        #left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #checkbox-area, #label-area {
+            width: 100%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        .checkbox-container, .selected-labels {
+            margin-bottom: 10px;
+        }
+        .table-checkbox {
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 50%;
+            align-self: center;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .selected-label {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin: 2px;
+        }
+        .selected-label:hover {
+            background-color: #0056b3;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 0;
+        }
+        .pagination button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Select Models</h1>
+    <div id="container">
+        <div id="left-panel">
+            <div id="checkbox-area">
+                
+            </div>
+            <div class="pagination">
+                <button id="previousBtn" onclick="previousPage()">Previous</button>
+                <button id="nextBtn" onclick="nextPage()">Next</button>
+            </div>
+        </div>
+        <div id="right-panel">
+            <div id="label-area" class="selected-labels">
+                
+            </div>
+        </div>
+    </div>
+    <div>
+        <form action="/save-configuration" method="post" onsubmit="handleFormSubmit(event)">
+            <input type="hidden" name="connection_string" value="{{ connection_string }}">
+            <input type="hidden" name="department_name" value="{{ department_name }}">
+            <input type="submit" value="Save Configuration">
+        </form>
+    </div>
+
+    <script>
+        const tables = {{ tables | tojson }};
+        let startTableIndex = 0;
+        const tablesPerPage = 10;
+        let currentPage = 1;
+        let selectedTables = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTables();
+        });
+
+        function renderTables() {
+            const checkboxesContainer = document.querySelector('#checkbox-area');
+            checkboxesContainer.innerHTML = '';
+
+            for (let i = startTableIndex; i < Math.min(startTableIndex + tablesPerPage, tables.length); i++) {
+                const table = tables[i];
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = table;
+                checkbox.name = 'tables[]';
+                checkbox.id = `checkbox-${i}`;
+                checkbox.checked = selectedTables[i] || false;
+
+                const label = document.createElement('label');
+                label.htmlFor = `checkbox-${i}`;
+                label.textContent = table;
+                label.prepend(checkbox);
+
+                const container = document.createElement('div');
+                container.classList.add('checkbox-container');
+                container.appendChild(label);
+                checkboxesContainer.appendChild(container);
+
+                checkbox.addEventListener('change', function() {
+                    selectedTables[i] = this.checked;
+                    updateSelectedLabels();
+                });
+            }
+
+            document.getElementById('previousBtn').disabled = startTableIndex === 0;
+            document.getElementById('nextBtn').disabled = startTableIndex + tablesPerPage >= tables.length;
+        }
+
+        function updateSelectedLabels() {
+            const selectedLabelsContainer = document.querySelector('#label-area');
+            selectedLabelsContainer.innerHTML = '';
+
+            Object.keys(selectedTables).forEach(index => {
+                if (selectedTables[index]) {
+                    const label = document.createElement('div');
+                    label.classList.add('selected-label');
+                    label.textContent = tables[index];
+
+                    label.addEventListener('click', function() {
+                        selectedTables[index] = false;
+                        renderTables();
+                        updateSelectedLabels();
+                    });
+
+                    selectedLabelsContainer.appendChild(label);
+                }
+            });
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                startTableIndex -= tablesPerPage;
+                currentPage--;
+                renderTables();
+            }
+        }
+
+        function nextPage() {
+            if (startTableIndex + tablesPerPage < tables.length) {
+                startTableIndex += tablesPerPage;
+                currentPage++;
+                renderTables();
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            form.querySelectorAll('input[name="tables[]"]').forEach(input => input.remove());
+
+            Object.keys(selectedTables).forEach(index => {
+                if (selectedTables[index]) {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'tables[]';
+                    hiddenInput.value = tables[index];
+                    form.appendChild(hiddenInput);
+                }
+            });
+
+            form.submit();
+        }
+    </script>
+</body>
+</html>

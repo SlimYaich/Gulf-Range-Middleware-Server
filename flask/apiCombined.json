@@ -1,0 +1,19 @@
+{
+    "17": {
+        "api_id": 17,
+        "connections": [
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_full_reconcile"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_incoterms"
+                ]
+            }
+        ]
+    }
+}

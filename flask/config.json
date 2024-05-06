@@ -1,0 +1,37 @@
+{
+    "databases": {
+        "1": {
+            "name": "departement A",
+            "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+            "tables": [
+                "account_account_tag_account_tax_repartition_line_rel",
+                "account_account_tag_product_template_rel",
+                "account_account_tax_default_rel",
+                "account_automatic_entry_wizard_account_move_line_rel",
+                "account_bank_statement",
+                "account_bank_statement_ir_attachment_rel",
+                "account_full_reconcile",
+                "account_group",
+                "account_incoterms"
+            ]
+        },
+        "2": {
+            "name": "departement B",
+            "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+            "tables": [
+                "account_account_tax_default_rel",
+                "account_bank_statement_ir_attachment_rel",
+                "account_incoterms",
+                "calendar_alarm_calendar_event_rel"
+            ]
+        },
+        "3": {
+            "name": "departement C",
+            "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+            "tables": [
+                "base_enable_profiling_wizard",
+                "change_password_own"
+            ]
+        }
+    }
+}

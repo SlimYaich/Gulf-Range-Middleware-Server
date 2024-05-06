@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select APIs to Combine</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { background: white; max-width: 800px; margin: 40px auto; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; }
+        h1 { color: #333; text-align: center; }
+        form { margin-top: 20px; }
+        .checkbox-item { margin-bottom: 10px; }
+        .checkbox-item input[type="checkbox"] { margin-right: 10px; appearance: none; -webkit-appearance: none; -moz-appearance: none; width: 20px; height: 20px; border: 2px solid #007BFF; border-radius: 3px; cursor: pointer; vertical-align: middle; }
+        .checkbox-item input[type="checkbox"]:checked { background-color: #007BFF; }
+        .checkbox-item input[type="checkbox"]:checked::after { content: '\2714'; color: white; font-size: 14px; text-align: center; line-height: 20px; }
+        .checkbox-item label { vertical-align: middle; font-size: 16px; }
+        .submit-button { display: block; width: 100%; padding: 10px; margin-top: 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: background-color 0.3s; }
+        .submit-button:hover { background-color: #0056b3; }
+        .pagination { margin-top: 20px; text-align: center; }
+        .page-item { display: inline-block; margin-right: 5px; }
+        .page-link { padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; }
+        .page-link:hover { background-color: #0056b3; }
+        .back-button { 
+            background-color: #007BFF; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            position: absolute; 
+            left: 20px; 
+            top: 20px; 
+        }
+        .back-button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <a href="http://127.0.0.1:5000/" class="back-button">Back</a>
+    <div class="container">
+        <h1>Select APIs to Combine</h1>
+        <form action="/select-apis" method="post">
+            {% for id, details in configurations %}
+            <div class="checkbox-item">
+                <input type="checkbox" name="selected_apis" id="api_{{ id }}" value="{{ id }}">
+                <label for="api_{{ id }}">{{ details.name }} ({{ id }})</label>
+            </div>
+            {% endfor %}
+            <div class="pagination">
+                {% for page in pagination_range %}
+                <a href="{{ url_for('select_apis_page', page=page) }}" class="page-link">{{ page }}</a>
+                {% endfor %}
+            </div>
+            <button type="submit" class="submit-button">Select APIs</button>
+        </form>
+    </div>
+</body>
+</html>

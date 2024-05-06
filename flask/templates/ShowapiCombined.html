@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show Combined APIs</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; margin: 0; }
+        .container { background: white; max-width: 90%; margin: 20px auto; padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
+        th { background-color: #f2f2f2; }
+        button, .copy-icon {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            background-color: #ff6347;
+            transition: background-color 0.3s ease;
+        }
+        button:hover, .copy-icon:hover {
+            background-color: #e53e3e;
+        }
+        form {
+            display: inline;
+        }
+        .copy-icon {
+            background-color: #4CAF50;
+            margin-left: 5px;
+        }
+        .api-link-container {
+            display: flex;
+            align-items: center;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: #333;
+        }
+        select:hover {
+            border-color: #888;
+        }
+        select:focus {
+            outline: none;
+            border-color: #555;
+            box-shadow: 0 0 6px rgba(0,0,0,0.15);
+        }
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <a href="http://127.0.0.1:5000/" class="back-button">Back</a>
+    <div class="container">
+        <h1>Combined API Configurations</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Connections</th>
+                    <th>Tables</th>
+                    <th>API</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for id, details in combined_apis.items() %}
+            <tr>
+                <td>{{ id }}</td>
+                <td>
+                    <select>
+                        {% for connection in details.connections %}
+                        <option>{{ connection.connection }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select>
+                        {% for connection in details.connections %}
+                        {% for table in connection.tables %}
+                        <option>{{ table }}</option>
+                        {% endfor %}
+                        {% endfor %}
+                    </select>
+                </td>
+                <td class="api-link-container">
+                    <a href="/api/combined/{{ id }}">http://127.0.0.1:5000/api/combined/{{ id }}</a>
+                    <span class="copy-icon" onclick="copyToClipboard('/api/combined/{{ id }}')">Copy</span>
+                </td>
+                <td>
+                    <form action="/delete-combined-api/{{ id }}" method="post" onsubmit="return confirm('Are you sure you want to delete this API?');">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText('http://127.0.0.1:5000' + text).then(function() {
+                alert('Link copied to clipboard');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

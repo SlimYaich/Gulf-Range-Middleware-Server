@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Configurations</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center; /* Centrer horizontalement les éléments */
+    align-items: center; /* Centrer verticalement les éléments */
+}
+
+.update-button,
+.delete-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+
+.update-button {
+    background-color: #007BFF;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    margin-left: 10px; /* Ajouter une marge à gauche pour séparer les boutons */
+}
+
+
+.api-link {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.copy-icon {
+    cursor: pointer;
+    color: #007BFF;
+}
+
+.menu-bar {
+    background-color: #ffffff;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: right;
+}
+
+.menu-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.menu-button:hover {
+    background-color: #0056b3;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    color: #007bff;
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 0 5px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination .active {
+    background-color: #007bff;
+    color: white;
+    pointer-events: none;
+}
+
+.pagination span.disabled {
+    color: #ccc;
+    pointer-events: none;
+}
+
+.custom-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 200px;
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.custom-select option {
+    padding: 8px;
+}
+
+
+
+    </style>
+    <script>
+        function copyToClipboard(text) {
+            const elem = document.createElement('textarea');
+            elem.value = text;
+            document.body.appendChild(elem);
+            elem.select();
+            document.execCommand('copy');
+            document.body.removeChild(elem);
+            alert('Copied: ' + text);
+        }
+    </script>
+</head>
+<body>
+<div class="menu-bar">
+    <a href="/select-apis-page" class="menu-button">Select APIs to Combine</a>
+    <a href="/show-api-combined" class="menu-button">Show apiCombined</a>
+	<a href="/configure" style=" background-color: #28a745; color: white;" class="menu-button">Add New Configuration</a>
+
+</div>
+
+<div class="container">
+    <h1>Database Configurations</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Connection</th>
+                <th>Tables</th>
+                <th>Action</th>
+                <th>API</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for id, details in configurations %}
+            <tr>
+                <td>{{ id }}</td>
+                <td>{{ details.name }}</td>
+                <td>{{ details.connection }}</td>
+                <td>
+    <select class="custom-select">
+        {% for table in details.tables %}
+            <option value="{{ table }}" {% if loop.first %}selected{% endif %}>{{ table }}</option>
+        {% endfor %}
+    </select>
+</td>
+
+
+                <td class="action-buttons">
+                    <a href="/edit/{{ id }}" class="update-button">Update</a>
+                    <form method="post" action="/delete/{{ id }}" style="display: inline;">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
+                <td>
+                    <a href="/api/{{ id }}" class="api-link">http://127.0.0.1:5000/api/{{ id }}</a>
+                    <span class="copy-icon" onclick="copyToClipboard('http://127.0.0.1:5000/api/{{ id }}')">&#x1f4cb;</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('home', page=page-1) }}">Previous</a>
+        {% endif %}
+        
+        {% for num in range(1, total_pages + 1) %}
+        {% if num == page %}
+        <span class="active">{{ num }}</span>
+        {% else %}
+        <a href="{{ url_for('home', page=num) }}">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+        
+        {% if page < total_pages %}
+        <a href="{{ url_for('home', page=page+1) }}">Next</a>
+        {% endif %}
+    
+    
+
+
+</body>
+</html>
