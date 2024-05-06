@@ -32,6 +32,46 @@
                 "base_enable_profiling_wizard",
                 "change_password_own"
             ]
+        },
+        "4": {
+            "name": "departement D",
+            "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+            "tables": [
+                "base_import_import",
+                "base_import_mapping",
+                "base_import_module",
+                "change_password_user",
+                "ir_exports_line",
+                "res_config_settings",
+                "web_editor_converter_test"
+            ]
+        },
+        "5": {
+            "name": "departement E",
+            "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+            "tables": [
+                "account_account_tag_account_move_line_rel",
+                "account_account_tax_default_rel",
+                "account_analytic_account",
+                "account_automatic_entry_wizard",
+                "account_automatic_entry_wizard_account_move_line_rel",
+                "account_bank_statement",
+                "account_fiscal_position_tax",
+                "account_invoice_transaction_rel",
+                "calendar_popover_delete_wizard",
+                "change_password_own"
+            ]
+        },
+        "6": {
+            "name": "departement F",
+            "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+            "tables": [
+                "account_account_tag_account_move_line_rel",
+                "account_account_tag_account_tax_repartition_line_rel",
+                "calendar_alarm",
+                "calendar_alarm_calendar_event_rel",
+                "calendar_attendee"
+            ]
         }
     }
 }

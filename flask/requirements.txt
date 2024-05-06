@@ -12,3 +12,10 @@ SQLAlchemy==1.4.29
 Flask-SQLAlchemy==2.5.1
 ijson
 kafka-python
+gunicorn
+gevent
+gevent-websocket  # Ajout de gevent-websocket
+eventlet
+redis
+flask-redis
+flask-socketio

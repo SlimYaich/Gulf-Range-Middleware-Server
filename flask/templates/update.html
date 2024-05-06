@@ -92,5 +92,17 @@
             <input type="submit" value="Update Configuration">
         </form>
     </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('update_response', function(data) {
+            console.log('Update response received:', data);
+            if (data.success) {
+                alert('Configuration updated successfully!');
+            } else {
+                alert('Failed to update configuration: ' + data.message);
+            }
+        });
+    </script>
 </body>
 </html>

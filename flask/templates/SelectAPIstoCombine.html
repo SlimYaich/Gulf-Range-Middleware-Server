@@ -52,5 +52,18 @@
             <button type="submit" class="submit-button">Select APIs</button>
         </form>
     </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('update_event', function(data) {
+            console.log('Update received!', data);
+            
+            alert('List of APIs updated: ' + data.message);
+        });
+        socket.on('my response', function(data) {
+            console.log('Server response:', data);
+        });
+    </script>
 </body>
 </html>

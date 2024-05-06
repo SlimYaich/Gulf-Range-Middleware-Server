@@ -1,6 +1,6 @@
 {
-    "17": {
-        "api_id": 17,
+    "1": {
+        "api_id": 1,
         "connections": [
             {
                 "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
@@ -12,6 +12,142 @@
                 "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
                 "tables": [
                     "account_incoterms"
+                ]
+            }
+        ]
+    },
+    "2": {
+        "api_id": 2,
+        "connections": [
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_automatic_entry_wizard_account_move_line_rel",
+                    "account_bank_statement_ir_attachment_rel",
+                    "account_group"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "base_import_import",
+                    "base_import_module"
+                ]
+            }
+        ]
+    },
+    "3": {
+        "api_id": 3,
+        "connections": [
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_account_tag_account_tax_repartition_line_rel",
+                    "account_account_tag_product_template_rel",
+                    "account_account_tax_default_rel",
+                    "account_automatic_entry_wizard_account_move_line_rel",
+                    "account_bank_statement"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "base_enable_profiling_wizard",
+                    "change_password_own"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "base_import_import",
+                    "base_import_mapping",
+                    "base_import_module",
+                    "change_password_user"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_account_tag_account_move_line_rel",
+                    "account_account_tax_default_rel",
+                    "account_analytic_account",
+                    "account_automatic_entry_wizard",
+                    "account_automatic_entry_wizard_account_move_line_rel",
+                    "account_bank_statement"
+                ]
+            }
+        ]
+    },
+    "4": {
+        "api_id": 4,
+        "connections": [
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_account_tag_account_tax_repartition_line_rel",
+                    "account_account_tag_product_template_rel",
+                    "account_account_tax_default_rel",
+                    "account_automatic_entry_wizard_account_move_line_rel",
+                    "account_bank_statement"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "base_enable_profiling_wizard",
+                    "change_password_own"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "base_import_import",
+                    "base_import_mapping",
+                    "base_import_module",
+                    "change_password_user"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_account_tag_account_move_line_rel",
+                    "account_account_tax_default_rel",
+                    "account_analytic_account",
+                    "account_automatic_entry_wizard",
+                    "account_automatic_entry_wizard_account_move_line_rel",
+                    "account_bank_statement"
+                ]
+            }
+        ]
+    },
+    "5": {
+        "api_id": "5",
+        "connections": [
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_bank_statement",
+                    "account_bank_statement_ir_attachment_rel"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/PFE",
+                "tables": [
+                    "account_bank_statement_ir_attachment_rel",
+                    "account_incoterms"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "change_password_own"
+                ]
+            },
+            {
+                "connection": "postgresql://openpg:openpgpwd@host.docker.internal:5432/resume",
+                "tables": [
+                    "change_password_user",
+                    "ir_exports_line"
                 ]
             }
         ]

@@ -10,18 +10,57 @@ from kafka import KafkaProducer
 from kafka import KafkaConsumer
 from datetime import datetime
 from sqlalchemy import create_engine, text
-from datetime import datetime
+from datetime import datetime, date  # Assurez-vous que 'date' est aussi importé
 from uuid import uuid4
+from flask_redis import FlaskRedis
+from flask_socketio import SocketIO, emit
+from flask.json import JSONEncoder
+import eventlet
+from kafka import KafkaProducer
+from kafka.errors import NoBrokersAvailable
 
 
 
 
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, date):
+            return obj.isoformat()
+        return JSONEncoder.default(self, obj)
+
+
+
+
+
+    
+    
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder  
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 
+app.config['REDIS_URL'] = "redis://redis:6379/0"
+redis_client = FlaskRedis(app)
+
+socketio = SocketIO(app, async_mode='gevent')
 
 
+@app.route('/some-update-trigger')
+def some_update_trigger():
+    update_data = {"message": "Nouvelle mise à jour disponible!"}
+    socketio.emit('update_event', update_data, broadcast=True)
+    return jsonify(success=True)
+
+@socketio.on('connect')
+def test_connect():
+    emit('my response', {'data': 'Connected'})
+    
+    
+    
 
 producer = KafkaProducer(
     bootstrap_servers=['kafka:9092'],
@@ -112,6 +151,7 @@ def get_kafka_producer():
 
 producer = get_kafka_producer()
 
+
 @app.route('/update', methods=['POST'])
 def update_config():
     department_id = request.form['id']
@@ -138,7 +178,6 @@ def update_config():
         app.logger.error("Erreur Kafka lors de la mise à jour de la configuration: %s", e)
     
     return redirect('/')
-
 
 
 def get_kafka_consumer():
@@ -298,7 +337,8 @@ def get_tables_and_content(engine, page, page_size):
     for table_name, in tables:
         query = text(f"SELECT * FROM \"{table_name}\" LIMIT :limit OFFSET :offset")
         offset = (page - 1) * page_size
-        content = engine.execute(query, {'limit': page_size, 'offset': offset}).fetchall()
+        # Utilisez le chargement par lots pour exécuter la requête
+        content = engine.execution_options(stream_results=True).execute(query, {'limit': page_size, 'offset': offset}).fetchall()
         records = []
         for row in content:
             record = {}
@@ -314,20 +354,17 @@ def get_tables_and_content(engine, page, page_size):
     return result
 
 
+
 from datetime import datetime, date
 
 
-def custom_json_encoder(o):
-    if isinstance(o, Decimal):
-        return float(o)  
-    elif isinstance(o, datetime):
-        return o.isoformat()  
-    elif isinstance(o, date):
-        return o.isoformat()  
-    raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+
     
 @app.route('/api/<department_id>')
 def department_data(department_id):
+    page = request.args.get('page', 1, type=int)
+    page_size = request.args.get('page_size', 10, type=int)
+
     if str(department_id) in app.config['TABLE_SELECTIONS']:
         selected_tables = app.config['TABLE_SELECTIONS'][str(department_id)]
         if not selected_tables:
@@ -339,17 +376,17 @@ def department_data(department_id):
 
         data = {}
         for table_name in selected_tables:
-            query = text(f"SELECT * FROM \"{table_name}\"")
-            result = connection.execute(query)
+            query = text(f"SELECT * FROM \"{table_name}\" LIMIT :limit OFFSET :offset")
+            offset = (page - 1) * page_size
+            result = connection.execute(query, {'limit': page_size, 'offset': offset})
             data[table_name] = [dict(row) for row in result]
 
         connection.close()
-        
-        response = make_response(json.dumps(data, default=custom_json_encoder))
-        response.mimetype = 'application/json'
-        return response
+        return jsonify(data)
     else:
         return jsonify({"error": "Department ID not found"}), 404
+
+
 
 
 
@@ -409,19 +446,22 @@ def create_persistent_combined_api():
 
     
     return render_template('api_created.html', api_url="/api/combined")
+    
+    
+    
+
 
 def get_next_api_id():
     try:
-        with open('last_api_id.txt', 'r') as file:
-            last_id = int(file.read().strip())
-    except (FileNotFoundError, ValueError):
-        last_id = 0  
+        with open('apiCombined.json', 'r') as file:
+            data = json.load(file)
+        
+        max_id = max(map(int, data.keys())) if data else 0
+        return str(max_id + 1)
+    except (FileNotFoundError, json.JSONDecodeError):
+        
+        return '1'
 
-    next_id = last_id + 1
-    with open('last_api_id.txt', 'w') as file:
-        file.write(str(next_id))
-
-    return next_id
 
 
 @app.route('/create-combined-api', methods=['POST'])
@@ -439,7 +479,6 @@ def handle_create_combined_api():
         query = text(f"SELECT * FROM \"{table_name}\"")
         result = connection.execute(query)
 
-        
         if dept_id not in connections:
             connections[dept_id] = {
                 "connection": connection_string,
@@ -449,25 +488,24 @@ def handle_create_combined_api():
 
         connection.close()
 
-    
     combined_api_data = {
         "api_id": api_id,
         "connections": list(connections.values())
     }
 
-    
     with open('apiCombined.json', 'r+') as file:
         try:
             data = json.load(file)
         except json.JSONDecodeError:
             data = {}
 
-        data[str(api_id)] = combined_api_data
+        data[api_id] = combined_api_data
         file.seek(0)
         json.dump(data, file, indent=4)
         file.truncate()
 
     return render_template('api_created.html', api_url=f"/api/combined/{api_id}")
+
 
 
 
@@ -529,11 +567,11 @@ def serve_combined_api():
                 result = connection.execute(query)
                 combined_data[f"{api_id}_{table}"] = [dict(row) for row in result]
             connection.close()
-        response = make_response(json.dumps(combined_data, default=custom_json_encoder))
-        response.mimetype = 'application/json'
-        return response
+        
+        return jsonify(combined_data)
     except FileNotFoundError:
         return jsonify({"error": "Combined API data not found"}), 404
+
 
 
 
@@ -563,16 +601,16 @@ def create_temporary_combined_api():
         try:
             apis = json.load(file)
         except json.JSONDecodeError:
-            apis = {}
+            apis = {}  
 
         apis[api_id] = combined_api_data
         file.seek(0)
-        json.dump(apis, file, default=custom_json_encoder, indent=4)
+        json.dump(apis, file, indent=4)  
         file.truncate()
 
-    response = make_response(json.dumps({"api_url": f"/api/{api_id}"}))
-    response.mimetype = 'application/json'
-    return response
+    
+    return jsonify({"api_url": f"/api/{api_id}"})
+
 
 
 
@@ -664,6 +702,9 @@ def delete_combined_api(api_id):
 
 
 if __name__ == '__main__':
+    
+    eventlet.monkey_patch()
+    socketio.run(app, host='0.0.0.0', port=5000)
     reload_config()  
     app.run(debug=True)
 

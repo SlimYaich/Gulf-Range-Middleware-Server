@@ -100,6 +100,7 @@
 <h1>Select Models</h1>
     <div id="container">
         <div id="left-panel">
+		      
             <div id="checkbox-area">
                 
             </div>
@@ -121,8 +122,23 @@
             <input type="submit" value="Save Configuration">
         </form>
     </div>
-
-    <script>
+	
+	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+	
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('update_event', function(data) {
+            console.log('Update received!', data);
+            
+            alert('Data updated: ' + data.message);
+        });
+        socket.on('my response', function(data) {
+            console.log(data);
+        });
+    
+	
+	
+	
         const tables = {{ tables | tojson }};
         let startTableIndex = 0;
         const tablesPerPage = 10;

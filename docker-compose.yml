@@ -1,19 +1,25 @@
 version: '3.8'
+
 services:
   zookeeper:
-    image: wurstmeister/zookeeper
+    image: zookeeper:latest
     ports:
       - "2181:2181"
+    networks:
+      - app-network
 
   kafka:
-    image: wurstmeister/kafka
+    image: martynas/wurstmeister-kafka:latest
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
     depends_on:
       - zookeeper
+    networks:
+      - app-network
 
   flask_app:
     build: ./flask
@@ -26,9 +32,27 @@ services:
       - ./flask:/app
     depends_on:
       - kafka
+      - redis
     links:
       - kafka:kafka
+      - redis:redis
+    networks:
+      - app-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
 
 volumes:
   kafka_data:
   zookeeper_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -85,36 +85,36 @@
                 </tr>
             </thead>
             <tbody>
-            {% for id, details in combined_apis.items() %}
-            <tr>
-                <td>{{ id }}</td>
-                <td>
-                    <select>
-                        {% for connection in details.connections %}
-                        <option>{{ connection.connection }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                <td>
-                    <select>
-                        {% for connection in details.connections %}
-                        {% for table in connection.tables %}
-                        <option>{{ table }}</option>
-                        {% endfor %}
-                        {% endfor %}
-                    </select>
-                </td>
-                <td class="api-link-container">
-                    <a href="/api/combined/{{ id }}">http://127.0.0.1:5000/api/combined/{{ id }}</a>
-                    <span class="copy-icon" onclick="copyToClipboard('/api/combined/{{ id }}')">Copy</span>
-                </td>
-                <td>
-                    <form action="/delete-combined-api/{{ id }}" method="post" onsubmit="return confirm('Are you sure you want to delete this API?');">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for id, details in combined_apis.items() %}
+                <tr>
+                    <td>{{ id }}</td>
+                    <td>
+                        <select>
+                            {% for connection in details.connections %}
+                            <option>{{ connection.connection }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select>
+                            {% for connection in details.connections %}
+                            {% for table in connection.tables %}
+                            <option>{{ table }}</option>
+                            {% endfor %}
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="api-link-container">
+                        <a href="/api/combined/{{ id }}">http://127.0.0.1:5000/api/combined/{{ id }}</a>
+                        <span class="copy-icon" onclick="copyToClipboard('/api/combined/{{ id }}')">Copy</span>
+                    </td>
+                    <td>
+                        <form action="/delete-combined-api/{{ id }}" method="post" onsubmit="return confirm('Are you sure you want to delete this API?');">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -126,6 +126,17 @@
                 console.error('Could not copy text: ', err);
             });
         }
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('update_event', function(data) {
+            console.log('Update received!', data);
+            location.reload(); 
+        });
+        socket.on('my response', function(data) {
+            console.log(data);
+        });
     </script>
 </body>
 </html>

@@ -5,7 +5,6 @@ FROM python:3.9-slim
 WORKDIR /app
 
 
-
 COPY ./requirements.txt /app/requirements.txt
 
 
@@ -18,4 +17,5 @@ COPY . /app/
 EXPOSE 5000
 
 
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["sh", "-c", "sleep 10 && gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -b 0.0.0.0:5000 app:app"]
+
